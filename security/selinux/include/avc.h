@@ -152,13 +152,6 @@ int avc_has_perm_flags(u32 ssid, u32 tsid,
 		       struct common_audit_data *auditdata,
 		       unsigned);
 
-static inline int avc_has_perm(u32 ssid, u32 tsid,
-			       u16 tclass, u32 requested,
-			       struct common_audit_data *auditdata)
-{
-	return avc_has_perm_flags(ssid, tsid, tclass, requested, auditdata, 0);
-}
-
 u32 avc_policy_seqno(void);
 
 #define AVC_CALLBACK_GRANT		1
