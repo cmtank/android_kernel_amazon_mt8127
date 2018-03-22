@@ -541,7 +541,7 @@ static void hp_reset_strategy(void)
 	mutex_unlock(&hp_mutex);
 }
 
-static void hp_work_handler(struct work_struct *work)
+static void __cpuinit hp_work_handler(struct work_struct *work)
 {
 	struct dbs_data *dbs_data;
 	struct hp_dbs_tuners *hp_tuners;
