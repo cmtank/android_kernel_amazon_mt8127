@@ -1,0 +1,13 @@
+
+menu "Bluetooth Rfkill device drivers"
+	depends on RFKILL
+
+config BRCM_BT
+	tristate "Broadcom Bluetooth RFKILL driver"
+	depends on RFKILL
+	default m
+	help
+	  Provides a parameter to switch on/off power from PMIC
+	  to Broadcom Bluetooth device.
+
+endmenu
