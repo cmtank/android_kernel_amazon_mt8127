@@ -208,7 +208,7 @@ unsigned int custom_pll_clock_remap(int input_mipi_clock)
 #endif
 static void lcm_mdelay(UINT32 ms)
 {
-    udelay(1000 * ms);
+    mdelay(ms);
 }
 void DSI_Enable_Log(bool enable)
 {
@@ -2392,7 +2392,7 @@ bool DSI_handle_int_TE(void)
 
     if(DSI_REG->DSI_STATE_DBG3.TCON_STATE == DSI_VDO_VFP_STATE)
     {
-        udelay(_dsiContext.vfp_period_us / 2);
+        mdelay((_dsiContext.vfp_period_us / 2) / 1000);
 
         if ((DSI_REG->DSI_STATE_DBG3.TCON_STATE == DSI_VDO_VFP_STATE) && DSI_REG->DSI_STATE_DBG0.CTL_STATE_0 == 0x1)
         {
@@ -2556,7 +2556,7 @@ void DSI_handle_noncont_clk(void)
 
     // Clock switch HS->LP->HS
     DSI_clk_HS_mode(0);
-    udelay(1);
+    mdelay(1 / 1000);
     DSI_clk_HS_mode(1);
 #endif
 #endif
@@ -2803,7 +2803,7 @@ void DSI_set_cmdq_V3(LCM_setting_table_V3 *para_tbl, unsigned int size, unsigned
 
         if (data_id == REGFLAG_ESCAPE_ID && cmd == REGFLAG_DELAY_MS_V3)
         {
-            udelay(1000*count);
+            mdelay(count);
             DISP_LOG_PRINT(ANDROID_LOG_INFO, "DSI", "DSI_set_cmdq_V3[%d]. Delay %d (ms) \n", index, count);
 
             continue;
