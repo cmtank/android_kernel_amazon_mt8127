@@ -4,6 +4,7 @@ config SND_TIMER
 
 config SND_PCM
 	tristate
+	depends on TRAPZ
 	select SND_TIMER
 
 config SND_HWDEP
@@ -66,6 +67,7 @@ config SND_PCM_OSS
 	tristate "OSS PCM (digital audio) API"
 	select SND_OSSEMUL
 	select SND_PCM
+	select SND_TIMER
 	help
 	  To enable OSS digital audio (PCM) emulation (/dev/dsp*), say Y
 	  here and read <file:Documentation/sound/alsa/OSS-Emulation.txt>.

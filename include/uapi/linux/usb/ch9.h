@@ -672,6 +672,9 @@ struct usb_otg_descriptor {
 	__u8  bDescriptorType;
 
 	__u8  bmAttributes;	/* support for HNP, SRP, etc */
+#ifdef CONFIG_USBIF_COMPLIANCE	
+	__le16 bcdOTG;
+#endif	
 } __attribute__ ((packed));
 
 /* from usb_otg_descriptor.bmAttributes */
@@ -705,6 +708,7 @@ struct usb_interface_assoc_descriptor {
 	__u8  iFunction;
 } __attribute__ ((packed));
 
+#define USB_DT_INTERFACE_ASSOCIATION_SIZE	8
 
 /*-------------------------------------------------------------------------*/
 

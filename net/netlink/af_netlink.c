@@ -2479,6 +2479,7 @@ static int netlink_dump(struct sock *sk)
 	struct netlink_callback *cb;
 	struct sk_buff *skb = NULL;
 	struct nlmsghdr *nlh;
+	struct module *module;
 	int len, err = -ENOBUFS;
 	int alloc_size;
 
@@ -2528,10 +2529,13 @@ static int netlink_dump(struct sock *sk)
 	if (cb->done)
 		cb->done(cb);
 	nlk->cb = NULL;
+	module = cb->module;
+	skb = cb->skb;
 	mutex_unlock(nlk->cb_mutex);
 
-	module_put(cb->module);
-	netlink_consume_callback(cb);
+	module_put(module);
+	consume_skb(skb);
+	kfree(cb);
 	return 0;
 
 errout_skb:
@@ -2830,10 +2834,10 @@ static int netlink_seq_show(struct seq_file *seq, void *v)
 		struct sock *s = v;
 		struct netlink_sock *nlk = nlk_sk(s);
 
-		seq_printf(seq, "%pK %-3d %-6u %08x %-8d %-8d %pK %-8d %-8d %-8lu\n",
+		seq_printf(seq, "%pK %-3d %-6d %08x %-8d %-8d %pK %-8d %-8d %-8lu\n",
 			   s,
 			   s->sk_protocol,
-			   nlk->portid,
+			   (int)(nlk->portid),
 			   nlk->groups ? (u32)nlk->groups[0] : 0,
 			   sk_rmem_alloc_get(s),
 			   sk_wmem_alloc_get(s),

@@ -47,6 +47,14 @@
 #include <linux/kernel.h>
 #include <linux/pm_runtime.h>
 
+#ifdef CONFIG_AMAZON_METRICS_LOG
+#include <linux/metricslog.h>
+#include <linux/vmalloc.h>
+#ifndef USBNET_METRICS_STR_LEN
+#define USBNET_METRICS_STR_LEN 128
+#endif
+#endif
+
 #define DRIVER_VERSION		"22-Aug-2005"
 
 
@@ -1406,6 +1414,9 @@ void usbnet_disconnect (struct usb_interface *intf)
 	struct usbnet		*dev;
 	struct usb_device	*xdev;
 	struct net_device	*net;
+#ifdef CONFIG_AMAZON_METRICS_LOG
+	char *buf;
+#endif
 
 	dev = usb_get_intfdata(intf);
 	usb_set_intfdata(intf, NULL);
@@ -1418,6 +1429,17 @@ void usbnet_disconnect (struct usb_interface *intf)
 		   intf->dev.driver->name,
 		   xdev->bus->bus_name, xdev->devpath,
 		   dev->driver_info->description);
+
+#ifdef CONFIG_AMAZON_METRICS_LOG
+	buf = (char *)vmalloc(USBNET_METRICS_STR_LEN * sizeof(char ));
+	if (buf) {
+		snprintf(buf, USBNET_METRICS_STR_LEN,
+			"UsbNet:usbnet_disconnect:Manufacture=%s;DV;1,Product=%s;DV;1,SerialNumber=%s;DV;1:NR\n",
+			xdev->manufacturer,xdev->product,xdev->serial);
+		log_to_metrics(ANDROID_LOG_INFO, "USBCableEvent", buf);
+		vfree(buf);
+	}
+#endif
 
 	net = dev->net;
 	unregister_netdev (net);
@@ -1469,6 +1491,9 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
 	int				status;
 	const char			*name;
 	struct usb_driver 	*driver = to_usb_driver(udev->dev.driver);
+#ifdef CONFIG_AMAZON_METRICS_LOG
+	char *buf;
+#endif
 
 	/* usbnet already took usb runtime pm, so have to enable the feature
 	 * for usb interface, otherwise usb_autopm_get_interface may return
@@ -1605,6 +1630,17 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
 		   dev->driver_info->description,
 		   net->dev_addr);
 
+#ifdef CONFIG_AMAZON_METRICS_LOG
+	buf = (char *)vmalloc(USBNET_METRICS_STR_LEN * sizeof(char ));
+	if (buf) {
+		snprintf(buf, USBNET_METRICS_STR_LEN,
+			"UsbNet:usbnet_probe:Manufacture=%s;DV;1,Product=%s;DV;1,SerialNumber=%s;DV;1:NR\n",
+			xdev->manufacturer,xdev->product,xdev->serial);
+		log_to_metrics(ANDROID_LOG_INFO, "USBCableEvent", buf);
+		vfree(buf);
+	}
+#endif
+
 	// ok, it's ready to go.
 	usb_set_intfdata (udev, dev);
 
@@ -1621,6 +1657,13 @@ out3:
 	if (info->unbind)
 		info->unbind (dev, udev);
 out1:
+	/* subdrivers must undo all they did in bind() if they
+	 * fail it, but we may fail later and a deferred kevent
+	 * may trigger an error resubmitting itself and, worse,
+	 * schedule a timer. So we kill it all just in case.
+	 */
+	cancel_work_sync(&dev->kevent);
+	del_timer_sync(&dev->delay);
 	free_netdev(net);
 out:
 	return status;

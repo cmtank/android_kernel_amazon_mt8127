@@ -1148,8 +1148,27 @@ static void hid_input_field(struct hid_device *hid, struct hid_field *field,
 		/* Ignore report if ErrorRollOver */
 		if (!(field->flags & HID_MAIN_ITEM_VARIABLE) &&
 		    value[n] >= min && value[n] <= max &&
+		    value[n] - min < field->maxusage &&
 		    field->usage[value[n] - min].hid == HID_UP_KEYBOARD + 1)
 			goto exit;
+
+		if (field->usage->hid == HID_DC_BATTERYSTRENGTH &&
+			hid->ll_driver->battery_level_ind &&
+			value[n] != hid->received_battery_level) {
+			hid_info(hid, "old battery level is %d; new value[%d]=%d\n",
+				hid->received_battery_level, n, value[n]);
+
+			hid->received_battery_level = value[n];
+
+			/* Convert New Battery Level into Percentage */
+			hid->battery_level = ((hid->received_battery_level -
+						field->logical_minimum) * 100) /
+						(field->logical_maximum -
+						field->logical_minimum);
+			hid->ll_driver->battery_level_ind(hid,
+				hid->battery_level);
+			hid_info(hid, "new normalized battery level is %d\n", hid->battery_level);
+		}
 	}
 
 	for (n = 0; n < count; n++) {
@@ -1160,11 +1179,13 @@ static void hid_input_field(struct hid_device *hid, struct hid_field *field,
 		}
 
 		if (field->value[n] >= min && field->value[n] <= max
+			&& field->value[n] - min < field->maxusage
 			&& field->usage[field->value[n] - min].hid
 			&& search(value, field->value[n], count))
 				hid_process_event(hid, field, &field->usage[field->value[n] - min], 0, interrupt);
 
 		if (value[n] >= min && value[n] <= max
+			&& value[n] - min < field->maxusage
 			&& field->usage[value[n] - min].hid
 			&& search(field->value, value[n], count))
 				hid_process_event(hid, field, &field->usage[value[n] - min], 1, interrupt);
@@ -1568,6 +1589,7 @@ EXPORT_SYMBOL_GPL(hid_disconnect);
  * used as a driver. See hid_scan_report().
  */
 static const struct hid_device_id hid_have_special_driver[] = {
+	{ HID_USB_DEVICE(USB_VENDOR_ID_AMAZON, USB_DEVICE_ID_AMAZON_GAMEPAD_WIFI) },
 	{ HID_USB_DEVICE(USB_VENDOR_ID_A4TECH, USB_DEVICE_ID_A4TECH_WCP32PU) },
 	{ HID_USB_DEVICE(USB_VENDOR_ID_A4TECH, USB_DEVICE_ID_A4TECH_X5_005D) },
 	{ HID_USB_DEVICE(USB_VENDOR_ID_A4TECH, USB_DEVICE_ID_A4TECH_RP_649) },
@@ -1834,6 +1856,18 @@ static const struct hid_device_id hid_have_special_driver[] = {
 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_MICROSOFT, USB_DEVICE_ID_MS_PRESENTER_8K_BT) },
 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_NINTENDO, USB_DEVICE_ID_NINTENDO_WIIMOTE) },
 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_NINTENDO, USB_DEVICE_ID_NINTENDO_WIIMOTE2) },
+
+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LAB126, USB_DEVICE_ID_LAB126_US_KB) },
+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_LAB126, USB_DEVICE_ID_LAB126_UK_KB) },
+	{ HID_BLUETOOTH_DEVICE(BT_VENDOR_ID_LAB126, USB_DEVICE_ID_LAB126_ASPEN_KB_US) },
+	{ HID_BLUETOOTH_DEVICE(BT_VENDOR_ID_LAB126, USB_DEVICE_ID_LAB126_ASPEN_KB_UK) },
+
+	{ HID_BLUETOOTH_DEVICE(BT_VENDOR_ID_LAB126, BT_DEVICE_ID_LAB126_abi123) },
+	{ HID_USB_DEVICE(BT_VENDOR_ID_LAB126, BT_DEVICE_ID_LAB126_abi123) },
+	{ HID_BLUETOOTH_DEVICE(BT_VENDOR_ID_LAB126, BT_DEVICE_ID_LAB126_abj123) },
+	{ HID_USB_DEVICE(BT_VENDOR_ID_LAB126, BT_DEVICE_ID_LAB126_abj123) },
+	{ HID_BLUETOOTH_DEVICE(BT_VENDOR_ID_LAB126, BT_DEVICE_ID_LAB126_abk123) },
+	{ HID_USB_DEVICE(BT_VENDOR_ID_LAB126, BT_DEVICE_ID_LAB126_abk123) },
 	{ }
 };
 

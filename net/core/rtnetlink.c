@@ -54,6 +54,8 @@
 #include <net/rtnetlink.h>
 #include <net/net_namespace.h>
 
+#include <linux/xlog.h>
+
 struct rtnl_link {
 	rtnl_doit_func		doit;
 	rtnl_dumpit_func	dumpit;
@@ -64,13 +66,22 @@ static DEFINE_MUTEX(rtnl_mutex);
 
 void rtnl_lock(void)
 {
+	#ifdef CONFIG_MTK_NET_LOGGING  
+	printk(KERN_DEBUG "[mtk_net][rtnl_lock]rtnl_lock++\n");
+	#endif
 	mutex_lock(&rtnl_mutex);
+	#ifdef CONFIG_MTK_NET_LOGGING  
+	printk(KERN_DEBUG "[mtk_net][rtnl_lock]rtnl_lock--\n");
+	#endif
 }
 EXPORT_SYMBOL(rtnl_lock);
 
 void __rtnl_unlock(void)
 {
 	mutex_unlock(&rtnl_mutex);
+	#ifdef CONFIG_MTK_NET_LOGGING  
+	printk(KERN_DEBUG "[mtk_net][rtnl_lock]rtnl_unlock done\n");
+	#endif
 }
 
 void rtnl_unlock(void)
@@ -899,14 +910,16 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb, struct net_device *dev,
 		goto nla_put_failure;
 
 	if (1) {
-		struct rtnl_link_ifmap map = {
-			.mem_start   = dev->mem_start,
-			.mem_end     = dev->mem_end,
-			.base_addr   = dev->base_addr,
-			.irq         = dev->irq,
-			.dma         = dev->dma,
-			.port        = dev->if_port,
-		};
+        struct rtnl_link_ifmap map;
+
+	    memset(&map, 0, sizeof(map));
+	    map.mem_start   = dev->mem_start;
+	    map.mem_end     = dev->mem_end;
+	    map.base_addr   = dev->base_addr;
+	    map.irq         = dev->irq;
+	    map.dma         = dev->dma;
+	    map.port        = dev->if_port;		
+
 		if (nla_put(skb, IFLA_MAP, sizeof(map), &map))
 			goto nla_put_failure;
 	}
@@ -1976,7 +1989,10 @@ void rtmsg_ifinfo(int type, struct net_device *dev, unsigned int change)
 	struct sk_buff *skb;
 	int err = -ENOBUFS;
 	size_t if_info_size;
-
+	#ifdef CONFIG_MTK_NET_LOGGING  
+    printk(KERN_INFO "[mtk_net][rtnetlink]rtmsg_ifinfo type:%d, dev:%s, change:%u, pid = %d", 
+		type, dev->name, change, current->pid);
+    #endif
 	skb = nlmsg_new((if_info_size = if_nlmsg_size(dev, 0)), GFP_KERNEL);
 	if (skb == NULL)
 		goto errout;

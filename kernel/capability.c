@@ -460,3 +460,4 @@ bool capable_wrt_inode_uidgid(const struct inode *inode, int cap)
 	return ns_capable(ns, cap) && kuid_has_mapping(ns, inode->i_uid) &&
 		kgid_has_mapping(ns, inode->i_gid);
 }
+EXPORT_SYMBOL(capable_wrt_inode_uidgid);
