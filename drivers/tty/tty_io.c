@@ -2575,15 +2575,15 @@ static int tiocsetd(struct tty_struct *tty, int __user *p)
 }
 
 /**
-* 	tiocgetd - get line discipline
-* 	@tty: tty device
-* 	@p: pointer to user data
-*
-* 	Retrieves the line discipline id directly from the ldisc.
-*
-* 	Locking: waits for ldisc reference (in case the line discipline
-* 	is changing or the tty is being hungup)
-*/
+ *	tiocgetd	-	get line discipline
+ *	@tty: tty device
+ *	@p: pointer to user data
+ *
+ *	Retrieves the line discipline id directly from the ldisc.
+ *
+ *	Locking: waits for ldisc reference (in case the line discipline
+ *		is changing or the tty is being hungup)
+ */
 
 static int tiocgetd(struct tty_struct *tty, int __user *p)
 {
