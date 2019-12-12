@@ -199,7 +199,11 @@ int32_t cmdqRecCreate(CMDQ_SCENARIO_ENUM scenario,
 
     if (0 != cmdq_rec_realloc_cmd_buffer(handle, CMDQ_INITIAL_CMD_BLOCK_SIZE))
     {
+#ifdef CONFIG_CMDQ_DMAPOOL_SUPPORT
+	cmdq_free_dma_pool(handle)
+#else
         kfree(handle);
+#endif
         return -ENOMEM;
     }
     

@@ -1460,7 +1460,11 @@ static TaskStruct* cmdq_find_free_task(uint32_t blockSize)
 #endif
             if (NULL == pVABase)
             {
-                kfree(pTask);
+#ifdef CONFIG_CMDQ_DMAPOOL_SUPPORT
+		cmdq_free_dma_pool(pTask);
+#else
+		kfree(pTask);
+#endif
                 pTask = NULL;
                 CMDQ_ERR("Can't allocate DMA buffer\n");
             }

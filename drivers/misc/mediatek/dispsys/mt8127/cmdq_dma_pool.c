@@ -27,6 +27,8 @@ struct bufferNode {
 	void * pBufferVA;
 	dma_addr_t pBufferPA;
 	int dmapool_index;
+	size_t size;
+	bool b_dma_alloced;
 	struct list_head listEntry;
 };
 
@@ -103,17 +105,6 @@ int cmdq_alloc_dma_pool(size_t size, dma_addr_t * dma_handle)
 		CMDQ_ERR("cmdq_alloc_dma_pool failed cause dmapool not created\n");
 		return NULL;
 	}
-		
-	if (!cmdq_find_dma_pool(size, &dmapoolIndex)) {
-		CMDQ_ERR("allocate dmapool failed size[%d]\n", size);
-		return NULL;
-	}
-
-	pVA = dma_pool_alloc(g_cmdq_dmapool_struct.cmdq_dmapool[dmapoolIndex], GFP_KERNEL, &PA);
-	if (NULL == pVA) {
-		CMDQ_ERR("cmdq_alloc_dma_pool call dma_pool_alloc failed\n");
-		return NULL;
-	}
 
 	struct bufferNode *pBufferNode = vmalloc(sizeof(struct bufferNode));
 	if (NULL == pBufferNode) {
@@ -121,9 +112,28 @@ int cmdq_alloc_dma_pool(size_t size, dma_addr_t * dma_handle)
 		return NULL;
 	}
 
+	if (!cmdq_find_dma_pool(size, &dmapoolIndex)) {
+		pVA = dma_alloc_coherent(NULL, size, &PA, GFP_KERNEL);
+		if (NULL == pVA) {
+			vfree(pBufferNode);
+			CMDQ_ERR("cmdq_alloc_dma_pool call dma_alloc_coherent failed\n");
+			return NULL;
+		}
+		pBufferNode->b_dma_alloced = true;
+	} else {
+		pVA = dma_pool_alloc(g_cmdq_dmapool_struct.cmdq_dmapool[dmapoolIndex], GFP_KERNEL, &PA);
+		if (NULL == pVA) {
+			vfree(pBufferNode);
+			CMDQ_ERR("cmdq_alloc_dma_pool call dma_pool_alloc failed\n");
+			return NULL;
+		}
+		pBufferNode->b_dma_alloced = false;
+	}
+
 	pBufferNode->dmapool_index = dmapoolIndex;
 	pBufferNode->pBufferPA = PA;
 	pBufferNode->pBufferVA = pVA;
+	pBufferNode->size = size;
 
 	list_add_tail(&(pBufferNode->listEntry), &(g_cmdq_dmapool_struct.listEntry));
 
@@ -153,8 +163,12 @@ int cmdq_free_dma_pool(void * pVA)
 		return -1;
 	}
 
-	/* free dmapool */
-	dma_pool_free(g_cmdq_dmapool_struct.cmdq_dmapool[pBufferNode->dmapool_index], pBufferNode->pBufferVA, pBufferNode->pBufferPA);
+	if (true == pBufferNode->b_dma_alloced) {
+		dma_free_coherent(NULL, pBufferNode->size, pBufferNode->pBufferVA, pBufferNode->pBufferPA);
+	} else {
+		/* free dmapool */
+		dma_pool_free(g_cmdq_dmapool_struct.cmdq_dmapool[pBufferNode->dmapool_index], pBufferNode->pBufferVA, pBufferNode->pBufferPA);
+	}
 
 	list_del(&(pBufferNode->listEntry));
 	vfree(pBufferNode);
