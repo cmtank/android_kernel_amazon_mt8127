@@ -1577,6 +1577,7 @@ int mtkfb_queue_overlay_config(struct mtkfb_device *fbdev, struct fb_overlay_con
     int i, fd = -1, ret = 0;
     bool drop_this_frame = false;
 
+#if 0
     if (fbdev->timeline_max - fbdev->timeline->value > 3)
     {
         for (i = 0; i < HW_OVERLAY_COUNT; i ++)
@@ -1608,7 +1609,7 @@ int mtkfb_queue_overlay_config(struct mtkfb_device *fbdev, struct fb_overlay_con
             return 0;
         }
     }
-
+#endif
     if (down_interruptible(&sem_early_suspend)) {
         dev_err(fbdev->dev, "semaphore down failed in %s\n", __func__);
         return -ERESTARTSYS;

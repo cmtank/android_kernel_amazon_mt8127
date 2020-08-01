@@ -38,6 +38,7 @@
 #define AUDIO_STATE_REPORT_ID  0xF2
 #define DIAG_REPORT_ID         0xF3
 #define ADPCM_AUDIO_REPORT_ID  0xF4
+#define GAME_CTLR_VOICE_REPORT_ID 0xF5
 
 #define PARTNER_KEY_USAGE      0x01
 #define ABS_VOLUME_USAGE       0xE0
@@ -377,6 +378,29 @@ static void process_adpcm_audio_data(unsigned char *raw_input, unsigned int size
 	dbg_hid("ftvremote: process_adpcm_audio_data Size %d\n", size);
 }
 
+static const __u32 amazon_ble_game_controller[] =
+{
+    BT_DEVICE_ID_LAB126_abc123
+};
+
+static int is_amazon_ble_game_controller(struct hid_device *hdev) {
+	int found = 0;
+
+	if (hdev->vendor == BT_VENDOR_ID_LAB126) {
+		__u32 product = hdev->product;
+		int i = 0;
+		int list_size = sizeof(amazon_ble_game_controller) / sizeof(__u32);
+		for (i = 0; i < list_size; i++) {
+			if (product == amazon_ble_game_controller[i]) {
+				found = 1;
+				break;
+			}
+		}
+	}
+
+	return found;
+}
+
 /*
  *  Deal with input raw event
  *  REPORT_ID:		DESCRIPTION:
@@ -420,6 +444,11 @@ static int ftv_remote_raw_event(struct hid_device *hdev, struct hid_report *repo
 	break;
 
 	case CONSUMER_REPORT_ID:
+		/* for BLE Game Controller this report ID is Usage (AC Home), ignore! */
+		if (is_amazon_ble_game_controller(hdev))
+			break;
+		/* fallthrough */
+	case GAME_CTLR_VOICE_REPORT_ID: /* specially added for BLE Game Controller */
 		keycode = (unsigned short *)&data[1];
 		dbg_hid("ftvremote: ftv_remote_raw_event consumer keycode: %d\n", *keycode);
 		for (i = 1; i < size; i++)

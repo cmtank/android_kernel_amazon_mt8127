@@ -120,7 +120,7 @@ static long cmdq_proc_unlocked_ioctl(struct file *file, unsigned int cmd, unsign
                 return -EFAULT;
             }
 
-            command.scenario   = cParams.scenario; 
+            command.scenario   = CMDQ_SCENARIO_MDP_STREAM_BITBLT;
             command.priority   = cParams.priority; 
             command.engineFlag = cParams.engineFlag; 
             command.pVABase  = cParams.pFrameBaseSW; 
@@ -147,7 +147,7 @@ static long cmdq_proc_unlocked_ioctl(struct file *file, unsigned int cmd, unsign
                 return -EFAULT;
             }
 
-            command.scenario   = csParams.command.scenario; 
+            command.scenario   = CMDQ_SCENARIO_MDP_STREAM_BITBLT;
             command.priority   = csParams.command.priority; 
             command.engineFlag = csParams.command.engineFlag; 
             command.pVABase  = csParams.command.pFrameBaseSW; 
