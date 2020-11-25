@@ -1160,7 +1160,7 @@ inline int avc_has_perm_noaudit(u32 ssid, u32 tsid,
  * permissions are granted, -%EACCES if any permissions are denied, or
  * another -errno upon other errors.
  */
-int avc_has_perm_flags(u32 ssid, u32 tsid, u16 tclass,
+int avc_has_perm(u32 ssid, u32 tsid, u16 tclass,
 		       u32 requested, struct common_audit_data *auditdata,
 		       unsigned flags)
 {

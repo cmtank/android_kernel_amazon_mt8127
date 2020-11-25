@@ -1556,7 +1556,7 @@ static int inode_has_perm(const struct cred *cred,
 	sid = cred_sid(cred);
 	isec = inode->i_security;
 
-	return avc_has_perm_flags(sid, isec->sid, isec->sclass, perms, adp, flags);
+	return avc_has_perm(sid, isec->sid, isec->sclass, perms, adp, flags);
 }
 
 /* Same as inode_has_perm, but pass explicit audit data containing
