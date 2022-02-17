@@ -150,7 +150,7 @@ static long auxadc_cali_unlocked_ioctl(struct file *file, unsigned int cmd,unsig
                 }
             }
 		for (i = 0; i < ADC_CHANNEL_MAX; i++)
-			printk(KERN_DEBUG "auxadc_cali_slop[%d] = %d\n", i, *(auxadc_cali_slop + i));
+			// printk(KERN_DEBUG "auxadc_cali_slop[%d] = %d\n", i, *(auxadc_cali_slop + i));
             break;
 
         case SET_ADC_CALI_Offset:
@@ -158,7 +158,7 @@ static long auxadc_cali_unlocked_ioctl(struct file *file, unsigned int cmd,unsig
             ret = copy_from_user(auxadc_cali_offset, nvram_data_addr, 36);
             g_AUXADC_Cali = KAL_FALSE;
 		for (i = 0; i < ADC_CHANNEL_MAX; i++)
-			printk(KERN_DEBUG "auxadc_cali_offset[%d] = %d\n", i, *(auxadc_cali_offset + i));
+			// printk(KERN_DEBUG "auxadc_cali_offset[%d] = %d\n", i, *(auxadc_cali_offset + i));
             break;
 
         case SET_ADC_CALI_Cal :

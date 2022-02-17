@@ -513,6 +513,7 @@ unsigned int PTP_INIT_01(void)
         return 1;
     }
 
+#if 0
     ptp_notice("PTPINITEN   = 0x%x\n", ptp_init_value.PTPINITEN);
     ptp_notice("PTPMONEN    = 0x%x\n", ptp_init_value.PTPMONEN);
     ptp_notice("MDES        = 0x%x\n", ptp_init_value.MDES);
@@ -534,6 +535,7 @@ unsigned int PTP_INIT_01(void)
     ptp_notice("FREQPCT5    = %d\n", ptp_init_value.FREQPCT5);
     ptp_notice("FREQPCT6    = %d\n", ptp_init_value.FREQPCT6);
     ptp_notice("FREQPCT7    = %d\n", ptp_init_value.FREQPCT7);
+#endif
 
     bus_dcm_disable(); //make sure bus dcm disable for PTP init 01
     mt_fh_popod_save(); // disable frequency hopping (main PLL)
@@ -595,8 +597,10 @@ unsigned int PTP_INIT_02(void)
     ptp_init_value.DCVOFFSETIN= ptp_dcvoffset;
     ptp_init_value.AGEVOFFSETIN= ptp_agevoffset;
 
+#if 0
     ptp_notice("DCVOFFSETIN = 0x%x \n", ptp_init_value.DCVOFFSETIN);
     ptp_notice("AGEVOFFSETIN = 0x%x \n", ptp_init_value.AGEVOFFSETIN);
+#endif
 
     if (ptp_init_value.PTPINITEN == 0x0)
     {
@@ -605,6 +609,7 @@ unsigned int PTP_INIT_02(void)
         return 1;
     }
 
+#if 0
     ptp_isr_info("PTPINITEN = 0x%x\n", ptp_init_value.PTPINITEN);
     ptp_isr_info("PTPMONEN = 0x%x\n", ptp_init_value.PTPMONEN);
     ptp_isr_info("MDES = 0x%x\n", ptp_init_value.MDES);
@@ -628,6 +633,7 @@ unsigned int PTP_INIT_02(void)
     ptp_isr_info("FREQPCT5 = %d\n", ptp_init_value.FREQPCT5);
     ptp_isr_info("FREQPCT6 = %d\n", ptp_init_value.FREQPCT6);
     ptp_isr_info("FREQPCT7 = %d\n", ptp_init_value.FREQPCT7);
+#endif
 
     PTP_Initialization_02(&ptp_init_value);
 
@@ -1014,14 +1020,18 @@ irqreturn_t mt_ptp_isr(int irq, void *dev_id)
     PTPINTSTS = ptp_read(PTP_PTPINTSTS);
     temp_ptpen = ptp_read(PTP_PTPEN);
 
+#if 0
     ptp_isr_info("PTPINTSTS = 0x%x\n", PTPINTSTS);
     ptp_isr_info("PTP_PTPEN = 0x%x\n", temp_ptpen);
+#endif
 
     ptp_data[1] = ptp_read(0xf100b240);
     ptp_data[2] = ptp_read(0xf100b27c);
 
+#if 0
     ptp_isr_info("*(0x1100b240) = 0x%x\n", ptp_data[1]);
     ptp_isr_info("*(0x1100b27c) = 0x%x\n", ptp_data[2]);
+#endif
 
     ptp_data[0] = 0;
 
@@ -1063,6 +1073,7 @@ irqreturn_t mt_ptp_isr(int irq, void *dev_id)
             ptp_init2_volt_6 = ptp_volt_6;
             ptp_init2_volt_7 = ptp_volt_7;
 
+#if 0
             ptp_isr_info("ptp_volt_0 = 0x%x\n", ptp_volt_0);
             ptp_isr_info("ptp_volt_1 = 0x%x\n", ptp_volt_1);
             ptp_isr_info("ptp_volt_2 = 0x%x\n", ptp_volt_2);
@@ -1072,6 +1083,7 @@ irqreturn_t mt_ptp_isr(int irq, void *dev_id)
             ptp_isr_info("ptp_volt_6 = 0x%x\n", ptp_volt_6);
             ptp_isr_info("ptp_volt_7 = 0x%x\n", ptp_volt_7);
             ptp_isr_info("ptp_level = 0x%x\n", ptp_level);
+#endif
 
             PTP_set_ptp_volt();
 
@@ -1121,6 +1133,7 @@ irqreturn_t mt_ptp_isr(int irq, void *dev_id)
             ptp_volt_6 = (temp>>16) & 0xff;
             ptp_volt_7 = (temp>>24) & 0xff;
 
+#if 0
             ptp_isr_info("ptp_volt_0 = 0x%x\n", ptp_volt_0);
             ptp_isr_info("ptp_volt_1 = 0x%x\n", ptp_volt_1);
             ptp_isr_info("ptp_volt_2 = 0x%x\n", ptp_volt_2);
@@ -1131,6 +1144,7 @@ irqreturn_t mt_ptp_isr(int irq, void *dev_id)
             ptp_isr_info("ptp_volt_7 = 0x%x\n", ptp_volt_7);
             ptp_isr_info("ptp_level = 0x%x\n", ptp_level);
             ptp_isr_info("ISR : TEMPSPARE1 = 0x%x\n", ptp_read(TEMPSPARE1));
+#endif
 
             PTP_set_ptp_volt();
         }

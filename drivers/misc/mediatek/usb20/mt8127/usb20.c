@@ -306,7 +306,7 @@ bool mt_usb_is_device(void)
 
 void mt_usb_connect(void)
 {
-	printk("[MUSB] USB is ready for connect\n");
+	//printk("[MUSB] USB is ready for connect\n");
     DBG(3, "is ready %d is_host %d power %d\n",mtk_musb->is_ready,mtk_musb->is_host , mtk_musb->power);
     if (!mtk_musb || !mtk_musb->is_ready || mtk_musb->is_host || mtk_musb->power)
         return;

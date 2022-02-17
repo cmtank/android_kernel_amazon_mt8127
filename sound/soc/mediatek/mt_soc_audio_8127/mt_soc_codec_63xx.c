@@ -157,17 +157,17 @@ void pmic_set_ana_reg(uint32_t offset, uint32_t value, uint32_t mask) /*Ana_Set_
 	int ret = 0;
 	uint32_t Reg_Value;
 
-	PRINTK_ANA_REG("pmic_set_ana_reg offset= 0x%x, value = 0x%x, mask = 0x%x\n", offset, value, mask);
+	// PRINTK_ANA_REG("pmic_set_ana_reg offset= 0x%x, value = 0x%x, mask = 0x%x\n", offset, value, mask);
 #ifdef AUDIO_USING_WRAP_DRIVER
 	Reg_Value = pmic_get_ana_reg(offset);
 	Reg_Value &= (~mask);
 	Reg_Value |= (value & mask);
 	ret = pwrap_write(offset, Reg_Value);
 	Reg_Value = pmic_get_ana_reg(offset);
-	if ((Reg_Value & mask) != (value & mask)) {
-		pr_warn("pmic_set_ana_reg offset= 0x%x, value = 0x%x mask = 0x%x ret = %d Reg_Value = 0x%x\n",
-			offset, value, mask, ret, Reg_Value);
-	}
+	// if ((Reg_Value & mask) != (value & mask)) {
+	// 	pr_warn("pmic_set_ana_reg offset= 0x%x, value = 0x%x mask = 0x%x ret = %d Reg_Value = 0x%x\n",
+	// 		offset, value, mask, ret, Reg_Value);
+	// }
 #endif
 }
 void analog_print(void)/*Ana_Log_Print*/

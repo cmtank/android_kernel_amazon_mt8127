@@ -123,7 +123,7 @@ int err = -ENODEV;
 struct timeval tv;
 
 ret = err;
-pr_err("enter  TEE_Icnt_time \n");
+//pr_err("enter  TEE_Icnt_time \n");
 
 shm_p = kmalloc(sizeof(struct TM_GB), GFP_KERNEL);
 
@@ -133,7 +133,7 @@ paramTypes = TZ_ParamTypes2(TZPT_VALUE_INPUT, TZPT_MEM_OUTPUT);
 do_gettimeofday(&tv);
 
 time_count = (DRM_UINT64)tv.tv_sec;
-pr_info("tv.tv_sec: %lu\n", time_count);
+//pr_info("tv.tv_sec: %lu\n", time_count);
 
 param[0].value.a = time_count;
 
@@ -141,7 +141,7 @@ ret = KREE_TeeServiceCall(session, TZCMD_SECURETIME_INC_CURRENT_COUNTER, paramTy
 if (ret != TZ_RESULT_SUCCESS)
 	pr_err("ServiceCall error %d\n", ret);
 
-#if 1
+#if 0
 pr_info("securetime increase result: %d %d %d %d %d %d %d\n", ((struct TM_GB *) shm_p)->tm_yday
 	, ((struct TM_GB *) shm_p)->tm_year, ((struct TM_GB *) shm_p)->tm_mon, ((struct TM_GB *) shm_p)->tm_mday
 	, ((struct TM_GB *) shm_p)->tm_hour, ((struct TM_GB *) shm_p)->tm_min, ((struct TM_GB *) shm_p)->tm_sec);
@@ -278,7 +278,7 @@ for (;;) {
 		}
 }
 
-		pr_err("update_securetime_thread_gb updata inc count\n");
+		//pr_err("update_securetime_thread_gb updata inc count\n");
 
 }
 

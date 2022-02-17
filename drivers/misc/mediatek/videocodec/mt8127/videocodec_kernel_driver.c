@@ -864,10 +864,12 @@ static long vcodec_unlocked_ioctl(struct file *file, unsigned int cmd, unsigned 
                         }
                     }
 
+#if 0
                     if (VAL_TRUE == bLockedHW)
                     {
                         MFV_LOGE("Lock ok grVcodecEncHWLock.pvHandle = 0x%x, va:%x, type:%d", grVcodecEncHWLock.pvHandle, (unsigned int)rHWLock.pvHandle, rHWLock.eDriverType);
                     }
+#endif
                     mutex_unlock(&VencHWLock);
                 }
 

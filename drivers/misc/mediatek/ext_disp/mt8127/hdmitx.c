@@ -1501,10 +1501,10 @@ static int hdmi_rdma_update_kthread(void *data)
                 sleep_cnt ++;
                 msleep(20);
 
-                if (0 == (sleep_cnt % 500))
-                {
-                    HDMI_LOG("[hdmi] list empty %lu, sleeping\n", sleep_cnt);
-                }
+                // if (0 == (sleep_cnt % 500))
+                // {
+                //     HDMI_LOG("[hdmi] list empty %lu, sleeping\n", sleep_cnt);
+                // }
             }
 
             if (sleep_cnt > 0)

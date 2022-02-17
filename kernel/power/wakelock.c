@@ -217,7 +217,7 @@ int pm_wake_lock(const char *buf)
 	}
 
 	//<20130327> <marc.huang> add wakelock dubug log
-	wakelock_log("%s\n", buf);
+	//wakelock_log("%s\n", buf);
 
 	mutex_lock(&wakelocks_lock);
 
@@ -266,7 +266,7 @@ int pm_wake_unlock(const char *buf)
 		return -EINVAL;
 
 	//<20130327> <marc.huang> add wakelock dubug log
-	wakelock_log("%s\n", buf);
+	//wakelock_log("%s\n", buf);
 
 	mutex_lock(&wakelocks_lock);
 
